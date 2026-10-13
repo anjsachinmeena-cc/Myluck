@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Do Duniya, Ek Dil</title>
+<style>
+:root{--bg:#07091f;--bg2:#1a1245;--tx:#f4f1ff;--mut:#b4b0dc;--acc:#ff7aa8;--gold:#ffd27a;--ink:#07091f;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#fff1ec;--bg2:#ffd9e6;--tx:#2a2145;--mut:#5f5380;--acc:#d63a74;--gold:#b87400;--ink:#fff}}
+:root[data-theme="dark"]{--bg:#07091f;--bg2:#1a1245;--tx:#f4f1ff;--mut:#b4b0dc;--acc:#ff7aa8;--gold:#ffd27a;--ink:#07091f}
+:root[data-theme="light"]{--bg:#fff1ec;--bg2:#ffd9e6;--tx:#2a2145;--mut:#5f5380;--acc:#d63a74;--gold:#b87400;--ink:#fff}
+*{box-sizing:border-box}
+html{height:100%}
+body{margin:0;background:linear-gradient(180deg,var(--bg),var(--bg2));background-attachment:fixed;color:var(--tx);font-family:Georgia,'Noto Serif',serif;line-height:1.85;overflow-x:hidden}
+#bar{position:fixed;top:0;left:0;height:3px;width:0;background:linear-gradient(90deg,var(--gold),var(--acc));z-index:9}
+#st{position:fixed;inset:0;pointer-events:none;transform:translateY(var(--py,0px))}
+#st i{position:absolute;width:3px;height:3px;border-radius:50%;background:var(--gold);opacity:.2;animation:tw 3s infinite}
+@keyframes tw{50%{opacity:.9;transform:scale(1.7)}}
+.shoot{position:fixed;top:12%;left:-10%;width:120px;height:2px;background:linear-gradient(90deg,transparent,var(--gold));transform:rotate(25deg);animation:sh 7s infinite;opacity:0;pointer-events:none}
+@keyframes sh{0%{left:-10%;top:8%;opacity:0}5%{opacity:1}22%{left:90%;top:40%;opacity:0}100%{opacity:0}}
+.sc{position:relative;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:56px 24px;max-width:640px;margin:auto;text-align:center}
+.ch{color:var(--gold);letter-spacing:.3em;font-size:.75rem;text-transform:uppercase;margin:0}
+h1{font-size:2.6rem;color:var(--acc);margin:.2em 0;text-shadow:0 0 30px var(--acc)}
+h2{font-size:1.6rem;margin:.2em 0 .5em}
+p{font-size:1.08rem;margin:.7em 0}
+.sub{color:var(--mut);font-style:italic}
+.art{width:100%;max-width:340px;margin:10px 0 18px;filter:drop-shadow(0 0 18px rgba(255,122,168,.25))}
+.rv>*{opacity:0;transform:translateY(34px);filter:blur(6px);transition:all 1.2s cubic-bezier(.2,.7,.2,1)}
+.rv.on>*{opacity:1;transform:none;filter:none}
+.rv.on>*:nth-child(2){transition-delay:.35s}.rv.on>*:nth-child(3){transition-delay:.7s}.rv.on>*:nth-child(4){transition-delay:1.05s}.rv.on>*:nth-child(5){transition-delay:1.4s}.rv.on>*:nth-child(6){transition-delay:1.7s}
+.hint{position:absolute;bottom:22px;color:var(--mut);animation:fl 2s infinite}
+.fl{animation:fl 4s ease-in-out infinite}
+@keyframes fl{50%{transform:translateY(-9px)}}
+.bt{transform-box:fill-box;transform-origin:center;animation:bt 1.2s infinite}
+@keyframes bt{50%{transform:scale(1.3)}}
+.dash{stroke-dasharray:6 7;animation:dm 2s linear infinite}
+@keyframes dm{to{stroke-dashoffset:-26}}
+.tr{animation:tr 5s linear infinite}
+@keyframes tr{from{transform:translateX(-120px)}to{transform:translateX(360px)}}
+.hl{animation:hl 6s linear infinite}
+@keyframes hl{from{transform:translateX(0)}to{transform:translateX(-340px)}}
+.wv{animation:wv 2s ease-in-out infinite}
+@keyframes wv{50%{transform:translateY(-6px);opacity:.2}}
+.sw{animation:sw 3s ease-in-out infinite;transform-box:fill-box;transform-origin:top}
+@keyframes sw{50%{transform:rotate(7deg)}}
+.pop{animation:pp 3s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes pp{0%,70%,100%{transform:scale(1);opacity:1}15%{transform:scale(1.15)}}
+.t1{opacity:0;animation:ty 4s infinite}.t2{opacity:0;animation:ty 4s 1.3s infinite}.t3{opacity:0;animation:ty 4s 2.6s infinite}
+@keyframes ty{10%,80%{opacity:1}100%{opacity:0}}
+.big{font-size:3rem;color:var(--gold);font-weight:bold;text-shadow:0 0 25px var(--gold)}
+#lg{position:fixed;top:10px;left:0;right:0;z-index:9;display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:0 8px}#lg button{background:rgba(0,0,0,.35);border:1px solid var(--mut);color:var(--tx);border-radius:16px;padding:4px 11px;font-size:.8rem;cursor:pointer;backdrop-filter:blur(6px)}#lg button.on{background:var(--acc);border-color:var(--acc);color:#fff}
+</style>
+</head>
+<body>
+<div id="bar"></div><div id="lg"></div><div id="st"></div><div class="shoot"></div>
+
+<div class="sc rv">
+<p class="ch">ek sachchi kahani</p>
+<h1>Do Duniya, Ek Dil</h1>
+<p class="sub">Sandeep aur Tian Tian</p>
+<svg class="art" viewBox="0 0 300 120"><circle cx="45" cy="70" r="14" fill="var(--gold)" class="fl"/><circle cx="255" cy="70" r="14" fill="var(--acc)" class="fl" style="animation-delay:1s"/><path class="dash" d="M62 65 Q150 -25 238 65" fill="none" stroke="var(--mut)" stroke-width="2"/><text x="150" y="38" text-anchor="middle" font-size="26" fill="var(--acc)" class="bt">♥</text><text x="45" y="108" text-anchor="middle" font-size="11" fill="var(--mut)">India</text><text x="255" y="108" text-anchor="middle" font-size="11" fill="var(--mut)">China</text></svg>
+<div class="hint">scroll karein ↓</div>
+</div>
+
+<div class="sc rv">
+<p class="ch">Adhyay 1</p><h2>Akela Bachpan</h2>
+<svg class="art" viewBox="0 0 300 180"><circle cx="230" cy="40" r="22" fill="var(--gold)" opacity=".9"/><path d="M0 150 Q80 110 160 140 T300 130 V180 H0Z" fill="var(--mut)" opacity=".35"/><circle cx="110" cy="112" r="9" fill="var(--tx)"/><path d="M110 121 v22 M110 128 l-10 10 M110 128 l10 10 M110 143 l-8 14 M110 143 l8 14" stroke="var(--tx)" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="110" cy="112" r="40" fill="none" stroke="var(--gold)" stroke-dasharray="3 8" class="dash"/></svg>
+<p>Ek ladka tha, Sandeep Kumar Meena. Pyaar se log use Sachin kehte the. Wo bachpan se achha tha, sach bolta tha, sabki baat sunta tha.</p>
+<p>Phir bhi ghar mein usse aur uske chhote bhai ke beech farak kiya jaata. Wo hamesha akela raha. Akelapan, udaasi, kam bol pana aur kamzor sharir, ye sab uske saath badhte gaye.</p>
+</div>
+
+<div class="sc rv">
+<p class="ch">Adhyay 2</p><h2>Do Bhai, Do Nazariye</h2>
+<svg class="art" viewBox="0 0 300 160"><circle cx="90" cy="70" r="55" fill="var(--gold)" opacity=".18" class="fl"/><circle cx="90" cy="70" r="18" fill="var(--gold)"/><circle cx="220" cy="90" r="8" fill="var(--mut)" class="pop"/><circle cx="220" cy="90" r="26" fill="none" stroke="var(--mut)" stroke-dasharray="3 8" class="dash"/></svg>
+<p>Chhote bhai se ghar kuch nahi kehta tha, kyunki wo sabki maan leta tha. Sandeep sach bolta tha, isliye sab usse galat samajhte the.</p>
+<p>Uske liye sirf dhamki thi aur warning. "Top karna hai, bas." Hausla badhane wala koi nahi tha.</p>
+</div>
+
+<div class="sc rv">
+<p class="ch">Adhyay 3 &middot; 2022-23</p><h2>10th: Bina Sahare Ki Jeet</h2>
+<div class="big">81%</div>
+<svg class="art" viewBox="0 0 300 130"><path d="M105 20 h90 v40 a45 45 0 0 1 -90 0z" fill="var(--gold)"/><rect x="140" y="102" width="20" height="14" fill="var(--gold)"/><rect x="118" y="116" width="64" height="8" rx="3" fill="var(--gold)"/><path d="M105 30 h-18 a18 18 0 0 0 18 30 M195 30 h18 a18 18 0 0 1 -18 30" fill="none" stroke="var(--gold)" stroke-width="5"/><text x="150" y="58" text-anchor="middle" font-size="28" fill="var(--ink)" font-weight="bold">15</text></svg>
+<p>Class 10 mein koi use motivate nahi karta tha. Phir bhi 2023 mein usne poore school mein 15th rank li, aur apne section aur class mein top kiya, 81% ke saath.</p>
+<p>Par ghar wale tab bhi naraz rahe. Us din Sandeep ne ghar se umeed rakhna chhod diya.</p>
+</div>
+
+<div class="sc rv">
+<p class="ch">Adhyay 4</p><h2>Ek Khilona Jaisa</h2>
+<svg class="art" viewBox="0 0 300 170"><path d="M70 0 V60 M150 0 V50 M230 0 V60" stroke="var(--mut)" stroke-width="2"/><g class="sw"><circle cx="150" cy="70" r="14" fill="var(--tx)"/><path d="M150 84 v36 M150 94 l-22 14 M150 94 l22 14 M150 120 l-12 28 M150 120 l12 28" stroke="var(--tx)" stroke-width="4" fill="none" stroke-linecap="round"/></g></svg>
+<p>11th mein usse zabardasti Maths-Science dilaya gaya. Usne wahi padha aur pehle class exam mein top kiya. Par ghar mein kisi ne yakeen nahi kiya.</p>
+<p>Phir wo average ho gaya, bas padhta tha. Fir bhi sab kehte, "Ye to game khelta rehta hai." Sunday ko bahar khelna bhi band ho gaya.</p>
+<p>Tab usse laga, jaise wo duniya mein ek toy hai, jise sab apni marzi se chalate hain.</p>
+</div>
+
+<div class="sc rv">
+<p class="ch">Adhyay 5</p><h2>Apne Raaste Par</h2>
+<svg class="art" viewBox="0 0 300 150"><rect x="60" y="80" width="30" height="55" fill="var(--acc)"/><rect x="95" y="65" width="26" height="70" fill="var(--gold)"/><rect x="126" y="85" width="34" height="50" fill="var(--mut)"/><rect x="165" y="70" width="28" height="65" fill="var(--acc)" opacity=".8"/><circle cx="240" cy="40" r="5" fill="var(--gold)" class="pop"/><path d="M200 135 H260" stroke="var(--tx)" stroke-width="3"/></svg>
+<p>Usne ghar se baat karna bahut kam kar diya aur JEE Mains aur Advanced ki taiyari mein lag gaya. Par ghar walon ne use phir school mein daal diya, "12th mein top karna hai."</p>
+<p>Is baar usne apne tareeke se padha. 12th mein 77.66% aaye. Phir JEE Mains ke do exam diye, aur dono mein nahi nikla. Ek saal ki mehnat poori nahi baithi.</p>
+</div>
+
+<div class="sc rv">
+<p class="ch">Adhyay 6</p><h2>Garam Phone, Tootta Hausla</h2>
+<svg class="art" viewBox="0 0 300 160"><rect x="120" y="40" width="60" height="100" rx="10" fill="none" stroke="var(--tx)" stroke-width="3"/><circle cx="150" cy="125" r="4" fill="var(--tx)"/><g stroke="var(--acc)" stroke-width="3" fill="none" stroke-linecap="round"><path class="wv" d="M130 30 q-6-8 0-16"/><path class="wv" d="M150 30 q-6-8 0-16" style="animation-delay:.4s"/><path class="wv" d="M170 30 q-6-8 0-16" style="animation-delay:.8s"/></g><path d="M135 70 l30 0 M135 85 l20 0" stroke="var(--mut)" stroke-width="3"/></svg>
+<p>Phir ek saal online classes ka mauka mila. Par uska phone purana tha, sirf 3.5 GB ka, aur bahut garam ho jaata tha. Ek mahine baad hi padhai ruk gayi.</p>
+<p>Usne ghar mein sabko bataya, madad maangi. Par kisi ne kuch nahi kiya. Us din usne sab se umeed chhod di.</p>
+</div>
+
+<div class="sc rv">
+<p class="ch">Adhyay 7</p><h2>Train Ka Safar</h2>
+<svg class="art" viewBox="0 0 300 150"><g class="hl"><path d="M0 100 Q40 60 80 100 T160 100 T240 100 T320 100 T400 100 T480 100 T560 100 T640 100 V150 H0Z" fill="var(--mut)" opacity=".3"/></g><line x1="0" y1="118" x2="300" y2="118" stroke="var(--tx)" stroke-width="2"/><g class="tr"><rect x="0" y="82" width="46" height="32" rx="5" fill="var(--acc)"/><rect x="50" y="82" width="46" height="32" rx="5" fill="var(--gold)"/><rect x="100" y="82" width="46" height="32" rx="5" fill="var(--acc)"/><rect x="8" y="90" width="12" height="10" fill="var(--ink)"/><rect x="58" y="90" width="12" height="10" fill="var(--ink)"/><rect x="108" y="90" width="12" height="10" fill="var(--ink)"/></g></svg>
+<p>Stage 1 nikal gaya, par Stage 2 bahut mushkil tha, aur wo nahi nikal paya. Ghar wale bahut naraz the.</p>
+<p>Exam dekar jab wo train se ghar laut raha tha, uska dil bahut bhaari tha. Phone mein koi dost nahi tha jisse wo apni baat keh sake.</p>
+</div>
+
+<div class="sc rv">
+<p class="ch">Adhyay 8</p><h2>Tian Tian</h2>
+<svg class="art" viewBox="0 0 300 170"><rect x="20" y="20" width="150" height="34" rx="14" fill="var(--gold)" class="t1"/><text x="95" y="42" text-anchor="middle" font-size="12" fill="var(--ink)" class="t1">Hello! Main Sandeep, India se</text><rect x="130" y="68" width="150" height="34" rx="14" fill="var(--acc)" class="t2"/><text x="205" y="90" text-anchor="middle" font-size="12" fill="var(--ink)" class="t2">Hi! I am Tian Tian, China</text><rect x="20" y="116" width="170" height="34" rx="14" fill="var(--gold)" class="t3"/><text x="105" y="138" text-anchor="middle" font-size="12" fill="var(--ink)" class="t3">Aaj kuch bataun? ♥</text></svg>
+<p>Hello Talk, ek language learning app par uski mulakat hui Tian Tian se. Wo China se thi, aur Sandeep India se.</p>
+<p>Us waqt Sandeep bahut udaas tha. Usne apni saari baatein Tian Tian se kahi. Tian Tian ne pyaar se suna, uska dard samjha. Pehli baar dil ki baat keh kar use bahut achha laga.</p>
+</div>
+
+<div class="sc rv">
+<p class="ch">Adhyay 9</p><h2>"I Love You"</h2>
+<svg class="art" viewBox="0 0 300 140"><text x="150" y="105" text-anchor="middle" font-size="110" fill="var(--acc)" class="bt">♥</text></svg>
+<p>Sandeep ko Tian Tian se pyaar ho gaya. Usne propose kar diya, "I love you." Tian Tian pehle bahut shock hui.</p>
+<p>Phir boli, "Hum ek-doosre ko time dete hain, aage dekhte hain." Sandeep maan gaya, aur aaj tak dono ek-doosre ke saath khush hain.</p>
+</div>
+
+<div class="sc rv">
+<p class="ch">Adhyay 10</p><h2>Jo Bhej Nahi Saka, Wo Bana Diya</h2>
+<svg class="art" viewBox="0 0 300 150"><rect x="50" y="20" width="200" height="110" rx="10" fill="none" stroke="var(--tx)" stroke-width="3"/><path d="M50 45 H250" stroke="var(--tx)" stroke-width="3"/><circle cx="66" cy="33" r="4" fill="var(--acc)"/><circle cx="80" cy="33" r="4" fill="var(--gold)"/><text x="150" y="102" text-anchor="middle" font-size="40" fill="var(--acc)" class="bt">♥</text><text x="150" y="68" text-anchor="middle" font-size="12" fill="var(--gold)">Happy Birthday</text></svg>
+<p>Rupaya kamzor aur yuan mazboot, isliye Sandeep kabhi koi physical gift nahi bhej paya. Ye baat use hamesha khalegi.</p>
+<p>Par usne Tian Tian ke birthday ke liye khud websites banayi. Unhe dekhkar wo bahut khush hui. Sachche tohfe wahi hote hain jo dil se bane hon.</p>
+</div>
+
+<div class="sc rv">
+<p class="ch">Adhyay 11</p><h2>Sapne Aur Sawaal</h2>
+<svg class="art" viewBox="0 0 300 150"><path class="dash" d="M30 120 Q150 -20 270 120" fill="none" stroke="var(--gold)" stroke-width="2"/><circle cx="30" cy="120" r="8" fill="var(--gold)"/><circle cx="270" cy="120" r="8" fill="var(--acc)"/><text x="150" y="48" text-anchor="middle" font-size="26" fill="var(--acc)" class="bt">♥</text><text x="150" y="140" text-anchor="middle" font-size="11" fill="var(--mut)">B.Tech → M.Tech → Job → Milna</text></svg>
+<p>Sandeep ne tay kiya hai: 4 saal ki B.Tech, phir M.Tech, taaki job ke chances badhein aur wo Tian Tian ke saath kahin reh sake. College ke baad wo use milne jayega.</p>
+<p>Kabhi dar bhi lagta hai. Kya Tian Tian chhod degi? Hum ek-doosre ki bhasha kaise samjhenge? Kya dono ke ghar wale apnayenge?</p>
+<p>In sawalon ke jawab waqt dega. Aaj itna pata hai: dono roz baat karte hain, aur ek-doosre ko seekh rahe hain.</p>
+</div>
+
+<div class="sc rv">
+<h2>Kahani Abhi Baaki Hai</h2>
+<svg class="art" viewBox="0 0 300 120"><circle cx="110" cy="60" r="14" fill="var(--gold)" class="fl"/><circle cx="190" cy="60" r="14" fill="var(--acc)" class="fl" style="animation-delay:1s"/><text x="150" y="68" text-anchor="middle" font-size="20" fill="var(--acc)" class="bt">♥</text></svg>
+<p>Jisne akele rehkar bhi haar nahi maani, uske liye raaste zaroor banenge. Ab uske saath sabse bada saathi hai, uska apna hausla.</p>
+<p class="sub">— To be continued —</p>
+</div>
+
+<script>
+var L={
+en:{n:'English',ch:'Chapter',sc:'scroll down ↓',tbc:'— To be continued —',s:[
+['Two Worlds, One Heart','Sandeep and Tian Tian'],
+['A Lonely Childhood','Sandeep, lovingly called Sachin, was kind and honest. Yet at home he was treated differently from his younger brother. He was always alone, and loneliness, sadness and a weak body grew with him.'],
+['Two Brothers, Two Views','His brother obeyed everyone, so nobody said a word to him. Sandeep spoke the truth, so he was misjudged. He got only threats and warnings, never encouragement.'],
+['10th: A Win Without Support','Nobody motivated him. Still, in 2023 he ranked 15th in his whole school and topped his class and section with 81%. His family was upset anyway, and that day he stopped hoping for their approval.'],
+['Like a Toy','In 11th he was forced into Maths and Science. He topped the first class exam, but nobody believed it. They said he only plays games, and even his Sunday outdoor games stopped. He felt like a toy that everyone moved as they liked.'],
+['On His Own Path','He spoke less to his family and began preparing for JEE. They put him back in school, so he finished 12th with 77.66%. Then he failed both JEE Mains attempts.'],
+['A Hot Phone, A Broken Spirit','He tried online classes, but his old 3.5 GB phone overheated, and after a month his studies stopped. He told his family and asked for help. Nobody did anything.'],
+['The Train Ride','The next year he passed Stage 1, but Stage 2 was too hard. His family was very upset. On the train home his heart was heavy, and he had no friend to share it with.'],
+['Tian Tian','On the language app HelloTalk he met Tian Tian from China. In his sadness he told her everything. She listened with kindness and understood his pain. For the first time, speaking his heart felt good.'],
+['"I Love You"','Sandeep fell in love and proposed. Tian Tian was shocked at first, then said, "Let us give each other time." He agreed, and they are happy together to this day.'],
+['What He Could Not Send, He Built','The rupee is weak and the yuan is strong, so he never managed to send a gift. That will always sadden him. But he built websites for her birthday with his own hands, and she was very happy.'],
+['Dreams and Questions','B.Tech, then M.Tech, then a job, so he can live near her, and then he will go to meet her. He sometimes fears she may leave, or wonders about language and families. Time will answer. For now, they talk every day and learn from each other.'],
+['The Story Is Not Over','Someone who never gave up, even alone, will find his roads. His greatest companion now is his own courage.']]},
+hi:{n:'हिन्दी',ch:'अध्याय',sc:'नीचे स्क्रॉल करें ↓',tbc:'— जारी है —',s:[
+['दो दुनिया, एक दिल','संदीप और तियान तियान'],
+['अकेला बचपन','संदीप, जिसे प्यार से लोग सचिन कहते थे, अच्छा और सच्चा था। फिर भी घर में उसके और छोटे भाई के बीच फर्क किया जाता था। वह हमेशा अकेला रहा, और अकेलापन, उदासी और कमज़ोर शरीर उसके साथ बढ़ते गए।'],
+['दो भाई, दो नज़रिए','छोटा भाई सबकी मान लेता था, इसलिए उससे कोई कुछ नहीं कहता था। संदीप सच बोलता था, इसलिए सब उसे गलत समझते थे। उसे सिर्फ धमकी और चेतावनी मिली, हौसला नहीं।'],
+['10वीं: बिना सहारे की जीत','कोई उसे प्रेरित नहीं करता था। फिर भी 2023 में उसने पूरे स्कूल में 15वीं रैंक पाई और अपने सेक्शन और क्लास में 81% के साथ टॉप किया। घरवाले तब भी नाराज़ रहे, और उस दिन उसने उनसे उम्मीद छोड़ दी।'],
+['एक खिलौने जैसा','11वीं में उसे ज़बरदस्ती मैथ्स-साइंस दिलाया गया। उसने पहले क्लास एक्ज़ाम में टॉप किया, पर किसी ने यकीन नहीं किया। सब कहते, वह तो गेम खेलता रहता है, और रविवार को बाहर खेलना भी बंद हो गया। उसे लगा, वह एक खिलौना है जिसे सब अपनी मर्ज़ी से चलाते हैं।'],
+['अपने रास्ते पर','उसने घर से बात करना कम कर दिया और JEE की तैयारी में लग गया। घरवालों ने उसे फिर स्कूल में डाल दिया, और उसने 12वीं में 77.66% पाए। फिर JEE Mains के दोनों प्रयासों में वह सफल नहीं हो पाया।'],
+['गरम फोन, टूटता हौसला','उसने ऑनलाइन क्लास ली, पर उसका पुराना 3.5 GB का फोन बहुत गरम होता था, और एक महीने बाद पढ़ाई रुक गई। उसने घर में बताया और मदद माँगी। किसी ने कुछ नहीं किया।'],
+['ट्रेन का सफर','अगले साल वह Stage 1 पास हुआ, पर Stage 2 बहुत कठिन था। घरवाले बहुत नाराज़ थे। ट्रेन से घर लौटते हुए उसका मन भारी था, और अपनी बात कहने के लिए कोई दोस्त नहीं था।'],
+['तियान तियान','लैंग्वेज ऐप HelloTalk पर उसकी मुलाकात चीन की तियान तियान से हुई। उदासी में उसने उसे सब कुछ बता दिया। उसने प्यार से सुना और उसका दर्द समझा। पहली बार दिल की बात कहकर उसे बहुत अच्छा लगा।'],
+['"I Love You"','संदीप को प्यार हो गया और उसने प्रपोज़ किया। तियान तियान पहले शॉक में थी, फिर बोली, "चलो एक-दूसरे को समय देते हैं।" वह मान गया, और आज तक दोनों साथ खुश हैं।'],
+['जो भेज न सका, वो बना दिया','रुपया कमज़ोर और युआन मज़बूत है, इसलिए वह कभी कोई गिफ्ट नहीं भेज पाया। ये बात उसे हमेशा खलेगी। पर उसने उसके जन्मदिन के लिए अपने हाथों से वेबसाइटें बनाईं, और वह बहुत खुश हुई।'],
+['सपने और सवाल','B.Tech, फिर M.Tech, फिर नौकरी, ताकि वह उसके पास रह सके, और फिर वह उससे मिलने जाएगा। कभी डर लगता है कि वह छोड़ न दे, या भाषा और परिवारों की चिंता होती है। जवाब वक्त देगा। अभी दोनों रोज़ बात करते हैं और एक-दूसरे से सीखते हैं।'],
+['कहानी अभी बाकी है','जिसने अकेले रहकर भी हार नहीं मानी, उसके लिए रास्ते ज़रूर बनेंगे। अब उसका सबसे बड़ा साथी उसका अपना हौसला है।']]},
+zh:{n:'中文',ch:'第',sc:'向下滑动 ↓',tbc:'— 未完待续 —',s:[
+['两个世界，一颗心','桑迪普和甜甜'],
+['孤独的童年','桑迪普被亲切地叫作萨钦，善良又诚实。可在家里，他和弟弟受到的对待不一样。他一直孤单，孤独、忧郁和虚弱的身体一直伴随着他。'],
+['两兄弟，两种看法','弟弟听所有人的话，所以没人说他什么。桑迪普说真话，所以大家误解他。他得到的只有威胁和警告，没有鼓励。'],
+['十年级：没人支持的胜利','没有人激励他。但2023年他在全校排名第15，以81%的成绩在班级和分组都是第一。家人依然不满，那天他不再对他们抱有期待。'],
+['像个玩具','十一年级他被迫选了数学和理科。他在第一次班级考试中拿了第一，却没人相信。大家说他只会玩游戏，连周日出去玩也被禁止了。他觉得自己像个玩具，被所有人随意摆弄。'],
+['走自己的路','他很少再和家人说话，开始准备JEE。家人又把他送回学校，他十二年级考了77.66%。后来JEE Mains的两次考试都没有通过。'],
+['发烫的手机，破碎的信心','他上了网课，可那部旧手机只有3.5GB，总是发烫，一个月后学习就中断了。他告诉家人并求助，却没人帮他。'],
+['火车上的旅程','第二年他通过了第一阶段，但第二阶段太难了。家人非常生气。坐火车回家时他心情沉重，没有朋友可以倾诉。'],
+['天天','在语言学习应用HelloTalk上，他认识了来自中国的天天。难过中他把一切都告诉了她。她温柔地倾听，理解他的痛苦。第一次说出心里话，他觉得很舒服。'],
+['“我爱你”','桑迪普爱上了她并表白。天天起初很震惊，然后说：“我们给彼此一些时间吧。”他答应了，至今两人在一起很幸福。'],
+['寄不出的，他亲手做了','卢比弱，人民币强，所以他一直没能寄礼物。这件事会让他一直遗憾。但他亲手为她的生日做了网站，她非常开心。'],
+['梦想与疑问','先读完B.Tech，再读M.Tech，找到工作，这样能和她生活在同一个地方，然后去见她。他有时害怕她会离开，也担心语言和两家人的态度。答案要交给时间。现在，他们每天聊天，互相学习。'],
+['故事还没有结束','即使独自一人也从不放弃的人，一定会走出自己的路。现在，陪伴他最久的，是他自己的勇气。']]},
+es:{n:'Español',ch:'Capítulo',sc:'desliza hacia abajo ↓',tbc:'— Continuará —',s:[
+['Dos mundos, un corazón','Sandeep y Tian Tian'],
+['Una infancia solitaria','Sandeep, a quien con cariño llamaban Sachin, era bueno y sincero. Aun así, en casa lo trataban distinto que a su hermano menor. Siempre estuvo solo, y la soledad, la tristeza y un cuerpo débil crecieron con él.'],
+['Dos hermanos, dos miradas','Su hermano obedecía a todos, así que nadie le decía nada. Sandeep decía la verdad, así que lo malinterpretaban. Solo recibió amenazas y advertencias, nunca ánimo.'],
+['10.º grado: un triunfo sin apoyo','Nadie lo motivaba. Aun así, en 2023 quedó 15.º en todo su colegio y fue el primero de su clase y sección con 81%. Su familia siguió molesta, y ese día dejó de esperar algo de ellos.'],
+['Como un juguete','En 11.º lo obligaron a estudiar Matemáticas y Ciencias. Fue el primero en el primer examen, pero nadie lo creyó. Decían que solo jugaba videojuegos, y hasta dejó de jugar fuera los domingos. Se sintió como un juguete que todos mueven a su antojo.'],
+['Por su propio camino','Habló menos con su familia y empezó a prepararse para el JEE. Lo volvieron a meter al colegio y terminó 12.º con 77,66%. Luego no aprobó ninguno de los dos intentos del JEE Mains.'],
+['Un móvil caliente, un ánimo roto','Probó clases en línea, pero su viejo móvil de 3,5 GB se recalentaba y al mes dejó de estudiar. Se lo dijo a su familia y pidió ayuda. Nadie hizo nada.'],
+['El viaje en tren','Al año siguiente pasó la Etapa 1, pero la Etapa 2 fue demasiado difícil. Su familia estaba muy molesta. En el tren de vuelta tenía el corazón pesado y ningún amigo con quien hablar.'],
+['Tian Tian','En la app de idiomas HelloTalk conoció a Tian Tian, de China. En su tristeza le contó todo. Ella lo escuchó con cariño y entendió su dolor. Por primera vez, abrir su corazón le sentó bien.'],
+['«Te quiero»','Sandeep se enamoró y se declaró. Tian Tian se sorprendió y luego dijo: «Démonos tiempo». Él aceptó, y hasta hoy son felices juntos.'],
+['Lo que no pudo enviar, lo construyó','La rupia es débil y el yuan es fuerte, así que nunca pudo enviarle un regalo. Eso siempre le dolerá. Pero creó con sus manos sitios web para su cumpleaños, y ella fue muy feliz.'],
+['Sueños y preguntas','B.Tech, luego M.Tech, luego un trabajo para poder vivir cerca de ella, y después irá a verla. A veces teme que ella se vaya, o se preocupa por el idioma y las familias. El tiempo responderá. Por ahora hablan cada día y aprenden el uno del otro.'],
+['La historia no ha terminado','Quien nunca se rindió, ni estando solo, encontrará sus caminos. Su mayor compañero ahora es su propio valor.']]},
+ko:{n:'한국어',ch:'챕터',sc:'아래로 스크롤 ↓',tbc:'— 계속됩니다 —',s:[
+['두 세계, 하나의 마음','산딥과 톈톈'],
+['외로운 어린 시절','산딥은 다정하게 사친이라 불렸고, 착하고 정직했어요. 그래도 집에서는 동생과 다르게 대해졌어요. 늘 혼자였고, 외로움과 우울함, 약한 몸이 함께 자랐어요.'],
+['두 형제, 두 시선','동생은 모두의 말을 따랐기에 아무도 뭐라 하지 않았어요. 산딥은 진실을 말해서 오해받았어요. 그가 들은 건 협박과 경고뿐, 격려는 없었어요.'],
+['10학년: 도움 없는 승리','아무도 그를 북돋아 주지 않았어요. 그래도 2023년에 전교 15등, 반과 분반 1등을 81%로 했어요. 가족은 여전히 못마땅했고, 그날 그는 가족에게 기대하기를 그만뒀어요.'],
+['장난감처럼','11학년 때 억지로 수학·과학 반에 들어갔어요. 첫 시험에서 1등을 했지만 아무도 믿지 않았어요. 게임만 한다고 했고, 일요일 야외 놀이도 못 하게 됐어요. 그는 모두가 마음대로 움직이는 장난감이 된 기분이었어요.'],
+['자기 길로','가족과 말을 줄이고 JEE 준비를 시작했어요. 가족은 그를 다시 학교에 넣었고, 12학년을 77.66%로 마쳤어요. 그 뒤 JEE Mains 두 번 모두 붙지 못했어요.'],
+['뜨거운 폰, 꺾인 의지','온라인 수업을 들었지만 오래된 3.5GB 폰이 너무 뜨거워져 한 달 만에 공부가 멈췄어요. 가족에게 도움을 청했지만 아무도 나서지 않았어요.'],
+['기차 여행','다음 해에 1단계는 통과했지만 2단계는 너무 어려웠어요. 가족은 크게 화를 냈어요. 집으로 가는 기차에서 마음이 무거웠고, 털어놓을 친구도 없었어요.'],
+['톈톈','언어 학습 앱 HelloTalk에서 중국의 톈톈을 만났어요. 슬픔 속에서 모든 걸 털어놓았고, 그녀는 다정하게 들으며 그의 아픔을 이해해 줬어요. 처음으로 마음을 말하니 참 좋았어요.'],
+['“사랑해”','산딥은 사랑에 빠져 고백했어요. 톈톈은 처음엔 놀랐지만 말했어요. “우리 서로에게 시간을 주자.” 그는 받아들였고, 지금까지 둘은 행복해요.'],
+['보내지 못한 것, 직접 만들다','루피는 약하고 위안은 강해서 선물을 보낼 수 없었어요. 그 점은 늘 아쉬울 거예요. 하지만 그녀의 생일을 위해 직접 웹사이트를 만들었고, 그녀는 정말 기뻐했어요.'],
+['꿈과 질문','B.Tech, 그다음 M.Tech, 그리고 취업해서 그녀 곁에 살 수 있게 되면 만나러 갈 거예요. 가끔 그녀가 떠날까 두렵고, 언어와 가족 문제도 걱정돼요. 답은 시간이 줄 거예요. 지금은 매일 대화하며 서로에게 배우고 있어요.'],
+['이야기는 아직 끝나지 않았어요','혼자서도 포기하지 않은 사람에게는 길이 열릴 거예요. 이제 그의 가장 큰 동반자는 자기 자신의 용기예요.']]}
+};
+var secs=document.querySelectorAll('.sc');
+secs.forEach(function(s){s._o={c:(s.querySelector('.ch')||{}).innerHTML,h:s.querySelector('h1,h2').innerHTML,p:Array.prototype.map.call(s.querySelectorAll('p:not(.ch):not(.sub)'),function(x){return x.innerHTML}),u:(s.querySelector('.sub')||{}).innerHTML,t:(s.querySelector('.hint')||{}).innerHTML}});
+function ap(k){document.documentElement.lang=k==='o'?'hi':k;secs.forEach(function(s,i){var o=s._o,c=s.querySelector('.ch'),h=s.querySelector('h1,h2'),ps=s.querySelectorAll('p:not(.ch):not(.sub)'),u=s.querySelector('.sub'),ht=s.querySelector('.hint');
+if(k==='o'){if(c)c.innerHTML=o.c;h.innerHTML=o.h;ps.forEach(function(p,j){p.innerHTML=o.p[j];p.style.display=''});if(u)u.innerHTML=o.u;if(ht)ht.innerHTML=o.t;return}
+var d=L[k].s[i];h.textContent=d[0];if(c)c.textContent=k==='zh'?'第 '+i+' 章':L[k].ch+' '+i;
+if(i===0){u.textContent=d[1]}else{ps.forEach(function(p,j){if(j===0)p.textContent=d[1];else p.style.display='none'});if(i===12&&u)u.textContent=L[k].tbc}
+if(ht)ht.textContent=L[k].sc});
+Array.prototype.forEach.call(document.getElementById('lg').children,function(b){b.classList.toggle('on',b.dataset.k===k)})}
+var lg=document.getElementById('lg');
+[['o','Hinglish']].concat(Object.keys(L).map(function(k){return [k,L[k].n]})).forEach(function(a){var b=document.createElement('button');b.textContent=a[1];b.dataset.k=a[0];b.onclick=function(){ap(a[0])};lg.appendChild(b)});
+ap('o');
+var st=document.getElementById('st');
+for(var i=0;i<55;i++){var e=document.createElement('i');e.style.left=Math.random()*100+'%';e.style.top=Math.random()*130+'%';e.style.animationDelay=Math.random()*3+'s';st.appendChild(e)}
+var io=new IntersectionObserver(function(en){en.forEach(function(x){if(x.isIntersecting)x.target.classList.add('on')})},{threshold:.25});
+document.querySelectorAll('.rv').forEach(function(el){io.observe(el)});
+addEventListener('scroll',function(){var h=document.documentElement,m=h.scrollHeight-innerHeight;document.getElementById('bar').style.width=(m>0?scrollY/m*100:0)+'%';st.style.setProperty('--py',(-scrollY*.15)+'px')},{passive:true});
+</script>
+</body>
+</html>
