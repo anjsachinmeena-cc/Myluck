@@ -582,4 +582,111 @@ class _ReelsScreenState extends State<ReelsScreen> {
       );
 }
 
-cl
+
+// ---------------- Reel data ----------------
+
+class Reel {
+  const Reel(this.url, this.title);
+  final String url;
+  final String title;
+}
+
+const reels = <Reel>[
+  Reel('https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4', 'Bee'),
+  Reel('https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4', 'Butterfly'),
+];
+
+// ---------------- ReelCard ----------------
+
+class ReelCard extends StatefulWidget {
+  const ReelCard({
+    super.key,
+    required this.reel,
+    required this.active,
+    required this.muted,
+    required this.liked,
+    required this.onLike,
+  });
+
+  final Reel reel;
+  final bool active;
+  final bool muted;
+  final bool liked;
+  final VoidCallback onLike;
+
+  @override
+  State<ReelCard> createState() => _ReelCardState();
+}
+
+class _ReelCardState extends State<ReelCard> {
+  late VideoPlayerController _c;
+  bool _ready = false;
+  bool _failed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _c = VideoPlayerController.networkUrl(Uri.parse(widget.reel.url));
+    _c.initialize().then((_) {
+      if (!mounted) return;
+      _c.setLooping(true);
+      _c.setVolume(widget.muted ? 0 : 1);
+      if (widget.active) _c.play();
+      setState(() => _ready = true);
+    }).catchError((_) {
+      if (mounted) setState(() => _failed = true);
+    });
+  }
+
+  @override
+  void didUpdateWidget(ReelCard old) {
+    super.didUpdateWidget(old);
+    if (!_ready) return;
+    _c.setVolume(widget.muted ? 0 : 1);
+    widget.active ? _c.play() : _c.pause();
+  }
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.black,
+      child: Stack(fit: StackFit.expand, children: [
+        if (_failed)
+          Center(child: Text(tr(context, 'videoFailed'), style: const TextStyle(color: Colors.white)))
+        else if (!_ready)
+          Center(child: Text(tr(context, 'loading'), style: const TextStyle(color: Colors.white)))
+        else
+          Center(
+            child: AspectRatio(
+              aspectRatio: _c.value.aspectRatio,
+              child: VideoPlayer(_c),
+            ),
+          ),
+        Positioned(
+          right: 16,
+          bottom: 80,
+          child: IconButton(
+            onPressed: widget.onLike,
+            icon: Icon(
+              widget.liked ? Icons.favorite : Icons.favorite_border,
+              color: widget.liked ? Colors.red : Colors.white,
+              size: 36,
+            ),
+          ),
+        ),
+        Positioned(
+          left: 16,
+          bottom: 40,
+          child: Text(widget.reel.title,
+              style: const TextStyle(color: Colors.white, fontSize: 16)),
+        ),
+      ]),
+    );
+  }
+}
