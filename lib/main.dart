@@ -207,50 +207,51 @@ class AuthStore {
   }
 }
 
-// ---------------- App ----------------
+// ---------------- App + main ----------------
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final lang = await LangStore.saved();
+  final savedLang = await LangStore.saved();
+  if (savedLang != null) langNotifier.value = savedLang;
   final user = await AuthStore.currentUser();
-  if (lang != null) langNotifier.value = lang;
-  runApp(MyluckApp(hasLang: lang != null, startUser: user));
+  runApp(MyluckApp(initialUser: user));
 }
 
 class MyluckApp extends StatelessWidget {
-  const MyluckApp({super.key, required this.hasLang, this.startUser});
-  final bool hasLang;
-  final String? startUser;
+  const MyluckApp({super.key, this.initialUser});
+  final String? initialUser;
 
   @override
   Widget build(BuildContext context) {
-    final u = startUser;
-    final Widget home = !hasLang
-        ? LanguageScreen(firstRun: true, startUser: u)
-        : (u == null ? const AuthScreen() : ReelsScreen(userName: u));
-    return LangScope(
-      notifier: langNotifier,
-      child: ValueListenableBuilder<String>(
-        valueListenable: langNotifier,
-        builder: (_, code, __) => MaterialApp(
-          title: 'Myluck',
+    return ValueListenableBuilder<String>(
+      valueListenable: langNotifier,
+      builder: (context, code, _) {
+        return MaterialApp(
           debugShowCheckedModeBanner: false,
+          title: 'Myluck',
           locale: Locale(code),
-          supportedLocales: [for (final l in languages) Locale(l.code)],
+          supportedLocales: languages.map((l) => Locale(l.code)).toList(),
           localizationsDelegates: const [
             GlobalMaterialLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
           theme: ThemeData(
-            brightness: Brightness.dark,
-            colorScheme: ColorScheme.fromSeed(seedColor: purple, brightness: Brightness.dark),
-            scaffoldBackgroundColor: Colors.black,
             useMaterial3: true,
+            brightness: Brightness.dark,
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: purple,
+              brightness: Brightness.dark,
+            ),
+            scaffoldBackgroundColor: Colors.black,
           ),
-          home: home,
-        ),
-      ),
+          builder: (context, child) =>
+              LangScope(notifier: langNotifier, child: child ?? const SizedBox()),
+          home: initialUser != null
+              ? ReelsScreen(userName: initialUser)
+              : const AuthScreen(),
+        );
+      },
     );
   }
 }
@@ -258,54 +259,27 @@ class MyluckApp extends StatelessWidget {
 // ---------------- Language screen ----------------
 
 class LanguageScreen extends StatelessWidget {
-  const LanguageScreen({super.key, this.firstRun = false, this.startUser});
-  final bool firstRun;
-  final String? startUser;
-
-  Future<void> pick(BuildContext context, String code) async {
-    await LangStore.set(code);
-    if (!context.mounted) return;
-    if (firstRun) {
-      final u = startUser;
-      Navigator.of(context).pushReplacement(MaterialPageRoute(
-        builder: (_) => u == null ? const AuthScreen() : ReelsScreen(userName: u),
-      ));
-    } else {
-      Navigator.of(context).pop();
-    }
-  }
+  const LanguageScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     final current = langNotifier.value;
     return Scaffold(
-      appBar: firstRun ? null : AppBar(title: Text(tr(context, 'language'))),
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.all(24),
-          children: [
-            if (firstRun) ...[
-              const SizedBox(height: 24),
-              const Text('myluck',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 40, fontWeight: FontWeight.w900, color: purple)),
-              const SizedBox(height: 14),
-              const Text('Choose your language\nअपनी भाषा चुनें\n选择语言',
-                  textAlign: TextAlign.center, style: TextStyle(fontSize: 18, height: 1.5)),
-              const SizedBox(height: 24),
-            ],
-            for (final l in languages)
-              Card(
-                child: ListTile(
-                  title: Text(l.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                  trailing: (!firstRun && l.code == current)
-                      ? const Icon(Icons.check_circle, color: purple)
-                      : null,
-                  onTap: () => pick(context, l.code),
-                ),
-              ),
-          ],
-        ),
+      appBar: AppBar(title: Text(tr(context, 'language'))),
+      body: ListView(
+        children: [
+          for (final l in languages)
+            ListTile(
+              title: Text(l.name),
+              trailing: l.code == current
+                  ? const Icon(Icons.check, color: purple)
+                  : null,
+              onTap: () async {
+                await LangStore.set(l.code);
+                if (context.mounted) Navigator.of(context).pop();
+              },
+            ),
+        ],
       ),
     );
   }
@@ -320,174 +294,182 @@ class AuthScreen extends StatefulWidget {
 }
 
 class _AuthScreenState extends State<AuthScreen> {
-  final formKey = GlobalKey<FormState>();
-  final email = TextEditingController();
-  final password = TextEditingController();
-  final confirm = TextEditingController();
-  bool signUp = false;
-  bool hide = true;
-  bool busy = false;
-  String? errorKey;
+  final _formKey = GlobalKey<FormState>();
+  final _email = TextEditingController();
+  final _pw = TextEditingController();
+  final _pw2 = TextEditingController();
+  bool _signUp = false;
+  bool _busy = false;
+  String? _error;
 
   @override
   void dispose() {
-    email.dispose();
-    password.dispose();
-    confirm.dispose();
+    _email.dispose();
+    _pw.dispose();
+    _pw2.dispose();
     super.dispose();
   }
 
-  void openReels(String? who) {
+  bool _validEmail(String v) =>
+      RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(v.trim());
+
+  Future<void> _submit() async {
+    if (!_formKey.currentState!.validate()) return;
+    setState(() {
+      _busy = true;
+      _error = null;
+    });
+    final err = _signUp
+        ? await AuthStore.signUp(_email.text, _pw.text)
+        : await AuthStore.login(_email.text, _pw.text);
+    if (!mounted) return;
+    if (err != null) {
+      setState(() {
+        _busy = false;
+        _error = err;
+      });
+      return;
+    }
+    final name = _email.text.trim().toLowerCase();
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => ReelsScreen(userName: who)),
+      MaterialPageRoute(builder: (_) => ReelsScreen(userName: name)),
     );
   }
 
-  void openLanguage() {
+  void _guest() {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (_) => const ReelsScreen()),
+    );
+  }
+
+  void _openLanguage() {
     Navigator.of(context).push(
       MaterialPageRoute(builder: (_) => const LanguageScreen()),
     );
   }
 
-  Future<void> submit() async {
-    if (!formKey.currentState!.validate()) return;
-    setState(() {
-      busy = true;
-      errorKey = null;
-    });
-    final e = email.text.trim();
-    final key = signUp
-        ? await AuthStore.signUp(e, password.text)
-        : await AuthStore.login(e, password.text);
-    if (!mounted) return;
-    if (key != null) {
-      setState(() {
-        busy = false;
-        errorKey = key;
-      });
-      return;
-    }
-    openReels(e.toLowerCase());
-  }
-
   @override
-  Widget build(BuildContext context) => Scaffold(
-        body: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24),
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 420),
               child: Form(
-                key: formKey,
+                key: _formKey,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Align(
                       alignment: Alignment.centerRight,
-                      child: TextButton.icon(
-                        onPressed: openLanguage,
+                      child: IconButton(
+                        onPressed: _openLanguage,
+                        tooltip: tr(context, 'language'),
                         icon: const Icon(Icons.language),
-                        label: Text(tr(context, 'language')),
                       ),
                     ),
-                    const Text('myluck',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 40, fontWeight: FontWeight.w900, color: purple)),
+                    const Text(
+                      'myluck',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 40,
+                        fontWeight: FontWeight.w900,
+                        color: purple,
+                      ),
+                    ),
                     const SizedBox(height: 8),
-                    Text(signUp ? tr(context, 'createAccount') : tr(context, 'welcomeBack'),
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(color: Colors.white70)),
-                    const SizedBox(height: 28),
+                    Text(
+                      tr(context, _signUp ? 'createAccount' : 'welcomeBack'),
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 18),
+                    ),
+                    const SizedBox(height: 24),
                     TextFormField(
-                      controller: email,
+                      controller: _email,
                       keyboardType: TextInputType.emailAddress,
                       decoration: InputDecoration(
                         labelText: tr(context, 'email'),
-                        prefixIcon: const Icon(Icons.email_outlined),
                         border: const OutlineInputBorder(),
                       ),
-                      validator: (v) {
-                        final t = (v ?? '').trim();
-                        if (!RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(t)) {
-                          return tr(context, 'errEmail');
-                        }
-                        return null;
-                      },
+                      validator: (v) =>
+                          _validEmail(v ?? '') ? null : tr(context, 'errEmail'),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
                     TextFormField(
-                      controller: password,
-                      obscureText: hide,
+                      controller: _pw,
+                      obscureText: true,
                       decoration: InputDecoration(
                         labelText: tr(context, 'password'),
-                        prefixIcon: const Icon(Icons.lock_outline),
                         border: const OutlineInputBorder(),
-                        suffixIcon: IconButton(
-                          onPressed: () => setState(() => hide = !hide),
-                          icon: Icon(hide ? Icons.visibility_off : Icons.visibility),
-                        ),
                       ),
-                      validator: (v) {
-                        if ((v ?? '').length < 6) return tr(context, 'errPwShort');
-                        return null;
-                      },
+                      validator: (v) => (v ?? '').length < 6
+                          ? tr(context, 'errPwShort')
+                          : null,
                     ),
-                    if (signUp) ...[
-                      const SizedBox(height: 16),
+                    if (_signUp) ...[
+                      const SizedBox(height: 12),
                       TextFormField(
-                        controller: confirm,
-                        obscureText: hide,
+                        controller: _pw2,
+                        obscureText: true,
                         decoration: InputDecoration(
                           labelText: tr(context, 'confirmPassword'),
-                          prefixIcon: const Icon(Icons.lock_outline),
                           border: const OutlineInputBorder(),
                         ),
-                        validator: (v) {
-                          if (v != password.text) return tr(context, 'errPwMatch');
-                          return null;
-                        },
+                        validator: (v) =>
+                            v != _pw.text ? tr(context, 'errPwMatch') : null,
                       ),
                     ],
-                    if (errorKey != null) ...[
-                      const SizedBox(height: 14),
-                      Text(tr(context, errorKey!),
+                    if (_error != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 12),
+                        child: Text(
+                          tr(context, _error!),
                           textAlign: TextAlign.center,
-                          style: const TextStyle(color: Colors.redAccent)),
-                    ],
+                          style: const TextStyle(color: Colors.redAccent),
+                        ),
+                      ),
                     const SizedBox(height: 20),
                     FilledButton(
-                      onPressed: busy ? null : submit,
                       style: FilledButton.styleFrom(
                         backgroundColor: purple,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
-                      child: busy
+                      onPressed: _busy ? null : _submit,
+                      child: _busy
                           ? const SizedBox(
-                              height: 18,
-                              width: 18,
-                              child: CircularProgressIndicator(strokeWidth: 2))
-                          : Text(signUp ? tr(context, 'signUp') : tr(context, 'login')),
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : Text(tr(context, _signUp ? 'signUp' : 'login')),
                     ),
-                    const SizedBox(height: 8),
                     TextButton(
-                      onPressed: () => setState(() {
-                        signUp = !signUp;
-                        errorKey = null;
-                      }),
-                      child: Text(signUp ? tr(context, 'haveAccount') : tr(context, 'noAccount')),
+                      onPressed: _busy
+                          ? null
+                          : () => setState(() {
+                                _signUp = !_signUp;
+                                _error = null;
+                              }),
+                      child: Text(
+                        tr(context, _signUp ? 'haveAccount' : 'noAccount'),
+                      ),
                     ),
-                    const Divider(height: 28),
-                    OutlinedButton.icon(
-                      onPressed: () => openReels(null),
-                      icon: const Icon(Icons.person_outline),
-                      label: Text(tr(context, 'guest')),
+                    OutlinedButton(
+                      onPressed: _busy ? null : _guest,
+                      child: Text(tr(context, 'guest')),
                     ),
                     const SizedBox(height: 16),
                     Text(
                       tr(context, 'localNote'),
                       textAlign: TextAlign.center,
-                      style: const TextStyle(color: Colors.white38, fontSize: 12),
+                      style: const TextStyle(color: Colors.white54, fontSize: 12),
                     ),
                   ],
                 ),
@@ -495,9 +477,10 @@ class _AuthScreenState extends State<AuthScreen> {
             ),
           ),
         ),
-      );
+      ),
+    );
+  }
 }
-
 // ---------------- Reels ----------------
 
 class ReelsScreen extends StatefulWidget {
@@ -582,20 +565,6 @@ class _ReelsScreenState extends State<ReelsScreen> {
       );
 }
 
-
-// ---------------- Reel data ----------------
-
-class Reel {
-  const Reel(this.url, this.title);
-  final String url;
-  final String title;
-}
-
-const reels = <Reel>[
-  Reel('https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4', 'Bee'),
-  Reel('https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4', 'Butterfly'),
-];
-
 // ---------------- ReelCard ----------------
 
 class ReelCard extends StatefulWidget {
@@ -619,60 +588,110 @@ class ReelCard extends StatefulWidget {
 }
 
 class _ReelCardState extends State<ReelCard> {
-  late VideoPlayerController _c;
+  VideoPlayerController? _c;
   bool _ready = false;
   bool _failed = false;
 
   @override
   void initState() {
     super.initState();
-    _c = VideoPlayerController.networkUrl(Uri.parse(widget.reel.url));
-    _c.initialize().then((_) {
+    _init();
+  }
+
+  Future<void> _init() async {
+    final c = VideoPlayerController.networkUrl(Uri.parse(widget.reel.url));
+    _c = c;
+    try {
+      await c.initialize();
       if (!mounted) return;
-      _c.setLooping(true);
-      _c.setVolume(widget.muted ? 0 : 1);
-      if (widget.active) _c.play();
+      await c.setLooping(true);
+      await c.setVolume(widget.muted ? 0 : 1);
+      if (widget.active) await c.play();
+      if (!mounted) return;
       setState(() => _ready = true);
-    }).catchError((_) {
+    } catch (_) {
       if (mounted) setState(() => _failed = true);
+    }
+  }
+
+  void _retry() {
+    _c?.dispose();
+    _c = null;
+    setState(() {
+      _failed = false;
+      _ready = false;
     });
+    _init();
   }
 
   @override
   void didUpdateWidget(ReelCard old) {
     super.didUpdateWidget(old);
-    if (!_ready) return;
-    _c.setVolume(widget.muted ? 0 : 1);
-    widget.active ? _c.play() : _c.pause();
+    final c = _c;
+    if (!_ready || c == null) return;
+    c.setVolume(widget.muted ? 0 : 1);
+    if (widget.active) {
+      c.play();
+    } else {
+      c.pause();
+    }
   }
 
   @override
   void dispose() {
-    _c.dispose();
+    _c?.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final c = _c;
+    final Widget content;
+    if (_failed) {
+      content = GestureDetector(
+        onTap: _retry,
+        behavior: HitTestBehavior.opaque,
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Text(
+              tr(context, 'videoFailed'),
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: Colors.white),
+            ),
+          ),
+        ),
+      );
+    } else if (!_ready || c == null) {
+      content = Center(
+        child: Text(
+          tr(context, 'loading'),
+          style: const TextStyle(color: Colors.white),
+        ),
+      );
+    } else {
+      content = SizedBox.expand(
+        child: FittedBox(
+          fit: BoxFit.cover,
+          child: SizedBox(
+            width: c.value.size.width,
+            height: c.value.size.height,
+            child: VideoPlayer(c),
+          ),
+        ),
+      );
+    }
+
     return Container(
       color: Colors.black,
       child: Stack(fit: StackFit.expand, children: [
-        if (_failed)
-          Center(child: Text(tr(context, 'videoFailed'), style: const TextStyle(color: Colors.white)))
-        else if (!_ready)
-          Center(child: Text(tr(context, 'loading'), style: const TextStyle(color: Colors.white)))
-        else
-          Center(
-            child: AspectRatio(
-              aspectRatio: _c.value.aspectRatio,
-              child: VideoPlayer(_c),
-            ),
-          ),
+        content,
         Positioned(
           right: 16,
           bottom: 80,
           child: IconButton(
             onPressed: widget.onLike,
+            tooltip: tr(context, widget.liked ? 'liked' : 'like'),
             icon: Icon(
               widget.liked ? Icons.favorite : Icons.favorite_border,
               color: widget.liked ? Colors.red : Colors.white,
@@ -682,9 +701,27 @@ class _ReelCardState extends State<ReelCard> {
         ),
         Positioned(
           left: 16,
+          right: 80,
           bottom: 40,
-          child: Text(widget.reel.title,
-              style: const TextStyle(color: Colors.white, fontSize: 16)),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                widget.reel.creator,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                widget.reel.caption,
+                style: const TextStyle(color: Colors.white, fontSize: 14),
+              ),
+            ],
+          ),
         ),
       ]),
     );
