@@ -7,6 +7,8 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_player/video_player.dart';
 
+import 'story_page.dart';
+
 const purple = Color(0xFF9D4EDD);
 
 // ---------------- Languages ----------------
@@ -245,8 +247,10 @@ class MyluckApp extends StatelessWidget {
             ),
             scaffoldBackgroundColor: Colors.black,
           ),
-          builder: (context, child) =>
-              LangScope(notifier: langNotifier, child: child ?? const SizedBox()),
+          builder: (context, child) => LangScope(
+            notifier: langNotifier,
+            child: StoryOverlay(child: child ?? const SizedBox()),
+          ),
           home: initialUser != null
               ? ReelsScreen(userName: initialUser)
               : const AuthScreen(),
@@ -481,6 +485,7 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 }
+
 // ---------------- Reels ----------------
 
 class ReelsScreen extends StatefulWidget {
@@ -619,21 +624,25 @@ class _ReelCardState extends State<ReelCard> {
     _c = null;
     setState(() {
       _failed = false;
-      _ready = false;
+    _ready = false;
     });
     _init();
   }
 
   @override
-  void didUpdateWidget(ReelCard old) {
+  void didUpdateWidget(covariant ReelCard old) {
     super.didUpdateWidget(old);
     final c = _c;
-    if (!_ready || c == null) return;
-    c.setVolume(widget.muted ? 0 : 1);
-    if (widget.active) {
-      c.play();
-    } else {
-      c.pause();
+    if (c == null || !_ready) return;
+    if (widget.active != old.active) {
+      if (widget.active) {
+        c.play();
+      } else {
+        c.pause();
+      }
+    }
+    if (widget.muted != old.muted) {
+      c.setVolume(widget.muted ? 0 : 1);
     }
   }
 
@@ -646,79 +655,92 @@ class _ReelCardState extends State<ReelCard> {
   @override
   Widget build(BuildContext context) {
     final c = _c;
-    final Widget content;
-    if (_failed) {
-      content = GestureDetector(
-        onTap: _retry,
-        behavior: HitTestBehavior.opaque,
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Text(
-              tr(context, 'videoFailed'),
-              textAlign: TextAlign.center,
-              style: const TextStyle(color: Colors.white),
-            ),
-          ),
-        ),
-      );
-    } else if (!_ready || c == null) {
-      content = Center(
-        child: Text(
-          tr(context, 'loading'),
-          style: const TextStyle(color: Colors.white),
-        ),
-      );
-    } else {
-      content = SizedBox.expand(
-        child: FittedBox(
-          fit: BoxFit.cover,
-          child: SizedBox(
-            width: c.value.size.width,
-            height: c.value.size.height,
-            child: VideoPlayer(c),
-          ),
-        ),
-      );
-    }
-
-    return Container(
-      color: Colors.black,
+    return GestureDetector(
+      onTap: _failed ? _retry : null,
+      onDoubleTap: widget.onLike,
       child: Stack(fit: StackFit.expand, children: [
-        content,
-        Positioned(
-          right: 16,
-          bottom: 80,
-          child: IconButton(
-            onPressed: widget.onLike,
-            tooltip: tr(context, widget.liked ? 'liked' : 'like'),
-            icon: Icon(
-              widget.liked ? Icons.favorite : Icons.favorite_border,
-              color: widget.liked ? Colors.red : Colors.white,
-              size: 36,
+        if (_ready && c != null)
+          FittedBox(
+            fit: BoxFit.cover,
+            child: SizedBox(
+              width: c.value.size.width,
+              height: c.value.size.height,
+              child: VideoPlayer(c),
+            ),
+          )
+        else
+          Center(
+            child: _failed
+                ? Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Text(
+                      tr(context, 'videoFailed'),
+                      textAlign: TextAlign.center,
+                    ),
+                  )
+                : Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const CircularProgressIndicator(color: purple),
+                      const SizedBox(height: 12),
+                      Text(tr(context, 'loading')),
+                    ],
+                  ),
+          ),
+        const Positioned(
+          left: 0,
+          right: 0,
+          bottom: 0,
+          height: 220,
+          child: IgnorePointer(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.bottomCenter,
+                  end: Alignment.topCenter,
+                  colors: [Colors.black87, Colors.transparent],
+                ),
+              ),
             ),
           ),
         ),
         Positioned(
           left: 16,
-          right: 80,
+          right: 88,
           bottom: 40,
           child: Column(
-            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
               Text(
                 widget.reel.creator,
                 style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
                   fontSize: 16,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 6),
+              Text(widget.reel.caption),
+            ],
+          ),
+        ),
+        Positioned(
+          right: 12,
+          bottom: 40,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                iconSize: 38,
+                onPressed: widget.onLike,
+                icon: Icon(
+                  widget.liked ? Icons.favorite : Icons.favorite_border,
+                  color: widget.liked ? Colors.pinkAccent : Colors.white,
+                ),
+              ),
               Text(
-                widget.reel.caption,
-                style: const TextStyle(color: Colors.white, fontSize: 14),
+                tr(context, widget.liked ? 'liked' : 'like'),
+                style: const TextStyle(fontSize: 12),
               ),
             ],
           ),
@@ -727,3 +749,4 @@ class _ReelCardState extends State<ReelCard> {
     );
   }
 }
+
