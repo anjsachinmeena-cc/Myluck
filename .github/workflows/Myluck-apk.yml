@@ -1,24 +1,55 @@
-name: myluck
-description: Myluck short-video app.
-publish_to: "none"
-version: 0.4.0+4
+name: Build Myluck Android APK
 
-environment:
-  sdk: ">=3.3.0 <4.0.0"
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
 
-dependencies:
-  flutter:
-    sdk: flutter
-  flutter_localizations:
-    sdk: flutter
-  video_player: ^2.9.2
-  shared_preferences: ^2.3.2
-  crypto: ^3.0.5
+permissions:
+  contents: read
 
-dev_dependencies:
-  flutter_test:
-    sdk: flutter
-  flutter_lints: ^4.0.0
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
 
-flutter:
-  uses-material-design: true
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Generate Android folder without touching lib
+        run: |
+          flutter create --platforms=android --project-name myluck --org com.myluck.app /tmp/scaffold
+          cp -r /tmp/scaffold/android ./android
+
+      - name: Add INTERNET permission and link queries
+        run: |
+          M=android/app/src/main/AndroidManifest.xml
+          grep -q 'android.permission.INTERNET' $M || sed -i 's#<application#<uses-permission android:name="android.permission.INTERNET"/>\n    <application#' $M
+          grep -q '<queries>' $M || sed -i 's#</manifest>#    <queries>\n        <intent><action android:name="android.intent.action.VIEW"/><data android:scheme="https"/></intent>\n    </queries>\n</manifest>#' $M
+
+      - name: Show main.dart head
+        run: head -5 lib/main.dart
+
+      - name: Get packages
+        run: flutter pub get
+
+      - name: Build release APK
+        run: flutter build apk --release
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: myluck-release-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+          if-no-files-found: error
